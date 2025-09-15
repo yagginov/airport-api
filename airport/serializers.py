@@ -92,3 +92,10 @@ class RouteListSerializer(RouteSerializer):
 class RouteDetailSerializer(RouteSerializer):
     source = AirportDetailSerializer(read_only=True)
     destination = AirportDetailSerializer(read_only=True)
+
+
+class CrewMemberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CrewMember
+        fields = ["id", "first_name", "last_name", "full_name"]
+        read_only_fields = ["id", "full_name"]
