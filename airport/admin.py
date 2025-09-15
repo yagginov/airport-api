@@ -11,7 +11,7 @@ from airport.models import (
     Flight,
     FlightCrew,
     Ticket,
-    Order
+    Order,
 )
 
 

@@ -12,7 +12,7 @@ from airport.models import (
     Flight,
     FlightCrew,
     Ticket,
-    Order
+    Order,
 )
 
 
@@ -52,3 +52,26 @@ class CitySerializer(serializers.ModelSerializer):
 
 class CityDetailSerializer(CitySerializer):
     country = CountrySerializer(read_only=True)
+
+
+class AirportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Airport
+        fields = ["id", "name", "closest_big_city"]
+        read_only_fields = ["id"]
+
+
+class AirportListSerializer(AirportSerializer):
+    closest_big_city = serializers.SlugRelatedField(slug_field="name", read_only=True)
+    country = serializers.SlugRelatedField(
+        slug_field="name", read_only=True, source="closest_big_city.country"
+    )
+
+    class Meta:
+        model = Airport
+        fields = ["id", "name", "closest_big_city", "country"]
+        read_only_fields = ["id", "closest_big_city", "country"]
+
+
+class AirportDetailSerializer(AirportSerializer):
+    closest_big_city = CityDetailSerializer(read_only=True)

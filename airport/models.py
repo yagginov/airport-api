@@ -87,9 +87,7 @@ class Route(models.Model):
 
 
 class Flight(models.Model):
-    route = models.ForeignKey(
-        Route, on_delete=models.CASCADE, related_name="flights"
-    )
+    route = models.ForeignKey(Route, on_delete=models.CASCADE, related_name="flights")
     airplane = models.ForeignKey(
         Airplane, on_delete=models.CASCADE, related_name="flights"
     )
@@ -126,9 +124,7 @@ class FlightCrew(models.Model):
 class Ticket(models.Model):
     row = models.PositiveIntegerField()
     seat = models.PositiveIntegerField()
-    flight = models.ForeignKey(
-        Flight, on_delete=models.CASCADE, related_name="tickets"
-    )
+    flight = models.ForeignKey(Flight, on_delete=models.CASCADE, related_name="tickets")
 
 
 class Order(models.Model):
@@ -136,6 +132,4 @@ class Order(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="orders"
     )
-    tickets = models.ManyToManyField(
-        Ticket, related_name="orders"
-    )
+    tickets = models.ManyToManyField(Ticket, related_name="orders")
