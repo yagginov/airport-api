@@ -17,6 +17,9 @@ from airport.serializers import (
     AirplaneTypeSerializer,
     AirplaneSerializer,
     AirplaneDetailSerializer,
+    CountrySerializer,
+    CitySerializer,
+    CityDetailSerializer,
 )
 
 
@@ -29,6 +32,20 @@ class AirplaneViewSet(ModelViewSet):
     queryset = Airplane.objects.select_related("airplane_type")
 
     def get_serializer_class(self):
-        if self.action in ("create", "update"):
+        if self.action in ["create", "update"]:
             return AirplaneSerializer
         return AirplaneDetailSerializer
+
+
+class CountryViewSet(ModelViewSet):
+    queryset = Country.objects.all()
+    serializer_class = CountrySerializer
+
+
+class CityViewSet(ModelViewSet):
+    queryset = City.objects.select_related("country")
+
+    def get_serializer_class(self):
+        if self.action in ["create", "update"]:
+            return CitySerializer
+        return CityDetailSerializer
