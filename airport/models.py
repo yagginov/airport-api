@@ -119,6 +119,9 @@ class FlightCrew(models.Model):
     )
     role = models.CharField(max_length=20, choices=CrewRole.choices)
 
+    class Meta:
+        verbose_name_plural = "Flight crew"
+
 
 class Ticket(models.Model):
     row = models.PositiveIntegerField()
