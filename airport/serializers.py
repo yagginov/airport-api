@@ -99,3 +99,55 @@ class CrewMemberSerializer(serializers.ModelSerializer):
         model = CrewMember
         fields = ["id", "first_name", "last_name", "full_name"]
         read_only_fields = ["id", "full_name"]
+
+
+class FlightCrewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FlightCrew
+        fields = ["crew_member", "role"]
+
+
+class FlightSerializer(serializers.ModelSerializer):
+    flight_crew = FlightCrewSerializer(many=True)
+
+    class Meta:
+        model = Flight
+        fields = ["id", "route", "airplane", "flight_crew", "departure_time", "arrival_time"]
+        read_only_fields = ["id"]
+
+    def create(self, validated_data: dict) -> Flight:
+        flight_crew_data = validated_data.pop("flight_crew", [])
+        print(flight_crew_data)
+        flight = Flight.objects.create(**validated_data)
+
+        for flight_crew in flight_crew_data:
+            FlightCrew.objects.create(
+                flight=flight,
+                **flight_crew
+            )
+
+        return flight
+
+    def update(self, instance: Flight, validated_data: dict) -> Flight:
+        crew_member_data = validated_data.pop("flight_crew", [])
+        
+        for field, value in validated_data.items():
+            setattr(instance, field, value)
+        instance.save()
+        
+        for crew_member in crew_member_data:
+            _, _ = FlightCrew.objects.get_or_create(
+                flight=instance,
+                **crew_member
+            )
+        return instance
+
+
+class FlightListSerializer(FlightSerializer):
+    route = RouteListSerializer(read_only=True)
+    airplane = serializers.SlugRelatedField(slug_field="name", read_only=True)
+
+
+class FlightDetailSerializer(FlightSerializer):
+    route = RouteDetailSerializer(read_only=True)
+    airplane = AirplaneDetailSerializer(read_only=True)
