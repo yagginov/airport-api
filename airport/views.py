@@ -23,6 +23,9 @@ from airport.serializers import (
     AirportSerializer,
     AirportListSerializer,
     AirportDetailSerializer,
+    RouteSerializer,
+    RouteListSerializer,
+    RouteDetailSerializer,
 )
 
 
@@ -63,3 +66,14 @@ class AirportViewSet(ModelViewSet):
         if self.action == "retrieve":
             return AirportDetailSerializer
         return AirportSerializer
+
+
+class RouteViewSet(ModelViewSet):
+    queryset = Route.objects.select_related("source__closest_big_city__country", "destination__closest_big_city__country")
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return RouteListSerializer
+        if self.action == "retrieve":
+            return RouteDetailSerializer
+        return RouteSerializer
