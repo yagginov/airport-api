@@ -5,12 +5,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-INSTALLED_APPS += [
-    "debug_toolbar"
-]
+INSTALLED_APPS += ["debug_toolbar"]
 
-INTERNAL_IPS = [
-    "127.0.0.1"
-]
+INTERNAL_IPS = ["127.0.0.1"]
 
 MIDDLEWARE.insert(1, "debug_toolbar.middleware.DebugToolbarMiddleware")
+
+
+DEBUG_TOOLBAR_CONFIG = {"UPDATE_ON_FETCH": True}

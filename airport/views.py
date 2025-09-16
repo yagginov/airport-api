@@ -2,7 +2,7 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework import mixins
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import F, Q
+from django.db.models import F, Q, Prefetch
 
 from airport.models import (
     AirplaneType,
@@ -146,7 +146,6 @@ class CrewMemberViewSet(ModelViewSet):
 
 
 class FlightViewSet(ModelViewSet):
-    queryset = Flight.objects.all()
     filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
     search_fields = [
         "route__source__name",
@@ -160,6 +159,18 @@ class FlightViewSet(ModelViewSet):
     ]
     ordering_fields = ["departure_time", "arrival_time"]
     filterset_class = FlightFilter
+
+    def get_queryset(self):
+        return Flight.objects.select_related(
+            "route__source__closest_big_city__country",
+            "route__destination__closest_big_city__country",
+            "airplane__airplane_type",
+        ).prefetch_related(
+            Prefetch(
+                "flight_crew", queryset=FlightCrew.objects.select_related("crew_member")
+            ),
+            "tickets",
+        )
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -180,7 +191,25 @@ class OrderViewSet(
     ordering_fields = ["created_at"]
 
     def get_queryset(self):
-        return Order.objects.filter(user=self.request.user).prefetch_related("tickets")
+        return Order.objects.filter(user=self.request.user).prefetch_related(
+            Prefetch(
+                "tickets",
+                queryset=Ticket.objects.select_related("flight").prefetch_related(
+                    Prefetch(
+                        "flight__route",
+                        queryset=Route.objects.select_related(
+                            "source__closest_big_city__country",
+                            "destination__closest_big_city__country",
+                        ),
+                    ),
+                    "flight__airplane__airplane_type",
+                    Prefetch(
+                        "flight__flight_crew",
+                        queryset=FlightCrew.objects.select_related("crew_member"),
+                    ),
+                ),
+            )
+        )
 
     def get_serializer_class(self):
         if self.action == "list":

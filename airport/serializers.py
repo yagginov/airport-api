@@ -109,6 +109,14 @@ class FlightCrewSerializer(serializers.ModelSerializer):
         fields = ["crew_member", "role"]
 
 
+class FlightCrewListSerializer(FlightCrewSerializer):
+    crew_member = serializers.SlugRelatedField(slug_field="full_name", read_only=True)
+
+
+class FlightCrewDetailSerializer(FlightCrewSerializer):
+    crew_member = CrewMemberSerializer(read_only=True)
+
+
 class FlightSerializer(serializers.ModelSerializer):
     flight_crew = FlightCrewSerializer(many=True)
 
@@ -148,6 +156,7 @@ class FlightSerializer(serializers.ModelSerializer):
 class FlightListSerializer(FlightSerializer):
     route = RouteListSerializer(read_only=True)
     airplane = serializers.SlugRelatedField(slug_field="name", read_only=True)
+    flight_crew = FlightCrewListSerializer(many=True, read_only=True)
 
 
 class TicketSerializer(serializers.ModelSerializer):
@@ -168,6 +177,7 @@ class FlightDetailSerializer(FlightSerializer):
     route = RouteDetailSerializer(read_only=True)
     airplane = AirplaneDetailSerializer(read_only=True)
     tickets = TicketFlightSerializer(many=True, read_only=True)
+    flight_crew = FlightCrewDetailSerializer(many=True, read_only=True)
 
     class Meta:
         model = Flight

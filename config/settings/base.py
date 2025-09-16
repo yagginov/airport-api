@@ -16,6 +16,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "django_filters",
+    "drf_spectacular",
     "accounts",
     "airport",
 ]
@@ -98,5 +99,13 @@ REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKEND": [
         "django_filters.rest_framework.DjangoFilterBackend",
         "rest_framework.filters.SearchFilter",
-    ]
+    ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Airport API",
+    "DESCRIPTION": "REST API for airport service",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
