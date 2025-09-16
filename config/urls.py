@@ -11,7 +11,11 @@ from drf_spectacular.views import (
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    # airport
     path("api/airport/", include("airport.urls", namespace="airport")),
+    # accounts
+    path("api/accounts/", include("accounts.urls", namespace="accounts")),
+    # docs
     path("api/doc/", SpectacularAPIView.as_view(), name="schema"),
     path("api/doc/swagger/", SpectacularSwaggerView.as_view(), name="swagger"),
     path("api/doc/redoc/", SpectacularRedocView.as_view(), name="redoc"),
