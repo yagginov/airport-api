@@ -1,6 +1,4 @@
 from rest_framework import serializers
-
-# from timezone_field.rest_framework import TimeZoneSerializerField
 from base.serializer_fields import TimeZoneSerializerChoicesField
 
 from airport.models import (
