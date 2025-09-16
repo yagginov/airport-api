@@ -22,7 +22,7 @@ class AirplaneTypeAdmin(admin.ModelAdmin):
 
 @admin.register(Airplane)
 class AirplaneAdmin(admin.ModelAdmin):
-    list_display = ["name", "rows", "seats_in_row", "capacity"]
+    list_display = ["name", "rows", "seats_in_row"]
 
 
 @admin.register(CrewMember)

@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from timezone_field.rest_framework import TimeZoneSerializerField
+
+# from timezone_field.rest_framework import TimeZoneSerializerField
+from base.serializer_fields import TimeZoneSerializerChoicesField
 
 from airport.models import (
     AirplaneType,
@@ -24,6 +26,8 @@ class AirplaneTypeSerializer(serializers.ModelSerializer):
 
 
 class AirplaneSerializer(serializers.ModelSerializer):
+    capacity = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = Airplane
         fields = ["id", "name", "rows", "seats_in_row", "airplane_type", "capacity"]
@@ -42,7 +46,7 @@ class CountrySerializer(serializers.ModelSerializer):
 
 
 class CitySerializer(serializers.ModelSerializer):
-    timezone = TimeZoneSerializerField(use_pytz=False)
+    timezone = TimeZoneSerializerChoicesField(use_pytz=False)
 
     class Meta:
         model = City
