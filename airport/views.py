@@ -1,4 +1,5 @@
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework import mixins
 
 from airport.models import (
     AirplaneType,
@@ -30,6 +31,9 @@ from airport.serializers import (
     FlightSerializer,
     FlightListSerializer,
     FlightDetailSerializer,
+    OrderSerializer,
+    OrderListSerializer,
+    OrderDetailSerializer,
 )
 
 
@@ -73,7 +77,9 @@ class AirportViewSet(ModelViewSet):
 
 
 class RouteViewSet(ModelViewSet):
-    queryset = Route.objects.select_related("source__closest_big_city__country", "destination__closest_big_city__country")
+    queryset = Route.objects.select_related(
+        "source__closest_big_city__country", "destination__closest_big_city__country"
+    )
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -97,3 +103,21 @@ class FlightViewSet(ModelViewSet):
         if self.action == "retrieve":
             return FlightDetailSerializer
         return FlightSerializer
+
+
+class OrderViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    GenericViewSet,
+):
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user).prefetch_related("tickets")
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return OrderListSerializer
+        if self.action == "retrieve":
+            return OrderDetailSerializer
+        return OrderSerializer

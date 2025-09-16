@@ -121,15 +121,15 @@ class FlightCrew(models.Model):
         verbose_name_plural = "flight crew"
 
 
-class Ticket(models.Model):
-    row = models.PositiveIntegerField()
-    seat = models.PositiveIntegerField()
-    flight = models.ForeignKey(Flight, on_delete=models.CASCADE, related_name="tickets")
-
-
 class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="orders"
     )
-    tickets = models.ManyToManyField(Ticket, related_name="orders")
+
+
+class Ticket(models.Model):
+    row = models.PositiveIntegerField()
+    seat = models.PositiveIntegerField()
+    flight = models.ForeignKey(Flight, on_delete=models.CASCADE, related_name="tickets")
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="tickets")

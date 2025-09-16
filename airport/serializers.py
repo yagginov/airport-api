@@ -112,34 +112,34 @@ class FlightSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Flight
-        fields = ["id", "route", "airplane", "flight_crew", "departure_time", "arrival_time"]
+        fields = [
+            "id",
+            "route",
+            "airplane",
+            "flight_crew",
+            "departure_time",
+            "arrival_time",
+        ]
         read_only_fields = ["id"]
 
     def create(self, validated_data: dict) -> Flight:
         flight_crew_data = validated_data.pop("flight_crew", [])
-        print(flight_crew_data)
         flight = Flight.objects.create(**validated_data)
 
         for flight_crew in flight_crew_data:
-            FlightCrew.objects.create(
-                flight=flight,
-                **flight_crew
-            )
+            FlightCrew.objects.create(flight=flight, **flight_crew)
 
         return flight
 
     def update(self, instance: Flight, validated_data: dict) -> Flight:
         crew_member_data = validated_data.pop("flight_crew", [])
-        
+
         for field, value in validated_data.items():
             setattr(instance, field, value)
         instance.save()
-        
+
         for crew_member in crew_member_data:
-            _, _ = FlightCrew.objects.get_or_create(
-                flight=instance,
-                **crew_member
-            )
+            _, _ = FlightCrew.objects.get_or_create(flight=instance, **crew_member)
         return instance
 
 
@@ -148,6 +148,90 @@ class FlightListSerializer(FlightSerializer):
     airplane = serializers.SlugRelatedField(slug_field="name", read_only=True)
 
 
+class TicketSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields = ["id", "row", "seat", "flight"]
+        read_only_fields = ["id"]
+
+
+class TicketFlightSerializer(TicketSerializer):
+    class Meta:
+        model = Ticket
+        fields = ["id", "row", "seat"]
+        read_only_fields = ["id"]
+
+
 class FlightDetailSerializer(FlightSerializer):
     route = RouteDetailSerializer(read_only=True)
     airplane = AirplaneDetailSerializer(read_only=True)
+    tickets = TicketFlightSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Flight
+        fields = [
+            "id",
+            "route",
+            "airplane",
+            "flight_crew",
+            "departure_time",
+            "arrival_time",
+            "tickets",
+        ]
+        read_only_fields = ["id", "route", "airplane", "tickets"]
+
+
+class FlightTicketSerializer(FlightDetailSerializer):
+    tickets = None
+
+    class Meta:
+        model = Flight
+        fields = [
+            "id",
+            "route",
+            "airplane",
+            "flight_crew",
+            "departure_time",
+            "arrival_time",
+        ]
+        read_only_fields = ["id", "route", "airplane"]
+
+
+class TicketListSerializer(TicketSerializer):
+    flight = FlightListSerializer(read_only=True)
+
+
+class TicketDetailSerializer(TicketSerializer):
+    flight = FlightTicketSerializer(read_only=True)
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    tickets = TicketSerializer(many=True)
+
+    class Meta:
+        model = Order
+        fields = ["id", "created_at", "tickets"]
+        read_only_fields = ["id"]
+
+    @property
+    def _user(self):
+        request = self.context.get("request")
+        if request:
+            return request.user
+
+    def create(self, validated_data: dict) -> Order:
+        tickets = validated_data.pop("tickets", [])
+        order = Order.objects.create(user=self._user, **validated_data)
+
+        for ticket in tickets:
+            Ticket.objects.create(order=order, **ticket)
+
+        return order
+
+
+class OrderListSerializer(OrderSerializer):
+    tickets = TicketListSerializer(many=True, read_only=True)
+
+
+class OrderDetailSerializer(OrderSerializer):
+    tickets = TicketDetailSerializer(many=True)
