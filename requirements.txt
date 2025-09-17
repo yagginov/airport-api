@@ -18,6 +18,8 @@ mypy_extensions==1.1.0
 packaging==25.0
 pathspec==0.12.1
 platformdirs==4.4.0
+psycopg==3.2.10
+psycopg-binary==3.2.10
 PyJWT==2.10.1
 python-dotenv==1.1.1
 PyYAML==6.0.2

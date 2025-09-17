@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  app:
+    build: 
+      context: .
+    command: >
+      sh -c "python manage.py migrate && \
+              python manage.py collectstatic --noinput && \
+              python manage.py runserver 0.0.0.0:8000"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "db", "-p", "5432"]
+      interval: 2s
+      timeout: 3s
+      retries: 5
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+    develop:
+      watch:
+        - path: ./
+          action: rebuild
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
