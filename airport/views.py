@@ -39,17 +39,23 @@ from airport.serializers import (
     OrderDetailSerializer,
 )
 from airport.filters import CityFilter, AirportFilter, RouteFilter, FlightFilter
+from base.permissions import (
+    IsAdminOrIsAuthenticatedReadOnly,
+    IsAdminAllowDeleteOrIsAuthenticatedReadAndCreateOnly,
+)
 
 
 class AirplaneTypeViewSet(ModelViewSet):
     queryset = AirplaneType.objects.all()
     serializer_class = AirplaneTypeSerializer
+    permission_classes = [IsAdminOrIsAuthenticatedReadOnly]
     filter_backends = [SearchFilter]
     search_fields = ["name"]
 
 
 class AirplaneViewSet(ModelViewSet):
     queryset = Airplane.objects.select_related("airplane_type")
+    permission_classes = [IsAdminOrIsAuthenticatedReadOnly]
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ["name", "airplane_type__name"]
     ordering_fields = ["capacity"]
@@ -68,6 +74,7 @@ class AirplaneViewSet(ModelViewSet):
 class CountryViewSet(ModelViewSet):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
+    permission_classes = [IsAdminOrIsAuthenticatedReadOnly]
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ["name"]
     ordering_fields = ["name"]
@@ -75,6 +82,7 @@ class CountryViewSet(ModelViewSet):
 
 class CityViewSet(ModelViewSet):
     queryset = City.objects.select_related("country")
+    permission_classes = [IsAdminOrIsAuthenticatedReadOnly]
     filter_backends = [SearchFilter, DjangoFilterBackend, OrderingFilter]
     search_fields = ["name", "country__name"]
     ordering_fields = ["name", "country__name"]
@@ -88,6 +96,7 @@ class CityViewSet(ModelViewSet):
 
 class AirportViewSet(ModelViewSet):
     queryset = Airport.objects.select_related("closest_big_city__country")
+    permission_classes = [IsAdminOrIsAuthenticatedReadOnly]
     filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
     search_fields = [
         "name",
@@ -109,6 +118,7 @@ class RouteViewSet(ModelViewSet):
     queryset = Route.objects.select_related(
         "source__closest_big_city__country", "destination__closest_big_city__country"
     )
+    permission_classes = [IsAdminOrIsAuthenticatedReadOnly]
     filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
     search_fields = [
         "source__name",
@@ -140,12 +150,14 @@ class RouteViewSet(ModelViewSet):
 class CrewMemberViewSet(ModelViewSet):
     queryset = CrewMember.objects.all()
     serializer_class = CrewMemberSerializer
+    permission_classes = [IsAdminOrIsAuthenticatedReadOnly]
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ["first_name", "last_name"]
     ordering_fields = ["first_name", "last_name"]
 
 
 class FlightViewSet(ModelViewSet):
+    permission_classes = [IsAdminOrIsAuthenticatedReadOnly]
     filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
     search_fields = [
         "route__source__name",
@@ -187,6 +199,7 @@ class OrderViewSet(
     mixins.DestroyModelMixin,
     GenericViewSet,
 ):
+    permission_classes = [IsAdminAllowDeleteOrIsAuthenticatedReadAndCreateOnly]
     filter_backends = [OrderingFilter]
     ordering_fields = ["created_at"]
 
