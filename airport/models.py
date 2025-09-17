@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from timezone_field import TimeZoneField
+from django.core.exceptions import ValidationError
 
 
 class AirplaneType(models.Model):
@@ -129,3 +130,22 @@ class Ticket(models.Model):
     seat = models.PositiveIntegerField()
     flight = models.ForeignKey(Flight, on_delete=models.CASCADE, related_name="tickets")
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="tickets")
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["row", "seat", "flight"], name="unique_ticket_per_flight")
+        ]
+
+    def clean(self):
+        airplane = self.flight.airplane
+        errors = {}
+        if self.row > airplane.rows:
+            errors["row"] = f"Row {self.row} exceeds airplane's max rows ({airplane.rows})"
+        if self.seat > airplane.seats_in_row:
+            errors["seat"] = f"Seat {self.seat} exceeds airplane's max seats in row ({airplane.seats_in_row})"
+        if errors:
+            raise ValidationError(errors)
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)

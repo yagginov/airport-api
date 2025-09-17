@@ -13,10 +13,12 @@ from airport.views import (
     OrderViewSet,
 )
 
+app_name = "airport"
+
 router = DefaultRouter()
 
 router.register("airplane_types", AirplaneTypeViewSet, basename="airplane-type")
-router.register("airplanes", AirplaneViewSet, basename="aplane")
+router.register("airplanes", AirplaneViewSet, basename="aiplane")
 router.register("countries", CountryViewSet, basename="country")
 router.register("cities", CityViewSet, basename="city")
 router.register("airports", AirportViewSet, basename="airport")
@@ -26,5 +28,3 @@ router.register("flights", FlightViewSet, basename="flight")
 router.register("orders", OrderViewSet, basename="order")
 
 urlpatterns = [path("", include(router.urls))]
-
-app_name = "ariport"

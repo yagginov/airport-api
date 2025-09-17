@@ -163,11 +163,11 @@ class FlightViewSet(ModelViewSet):
         "route__source__name",
         "route__source__closest_big_city__name",
         "route__source__closest_big_city__country__name",
-        "route__destinaton__name",
+        "route__destination__name",
         "route__destination__closest_big_city__name",
         "route__destination__closest_big_city__country__name",
         "airplane__name",
-        "airplane__airplane__type__name",
+        "airplane__airplane_type__name",
     ]
     ordering_fields = ["departure_time", "arrival_time"]
     filterset_class = FlightFilter

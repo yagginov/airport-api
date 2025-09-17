@@ -1,6 +1,6 @@
 import django_filters as filters
 
-from airport.models import Country, City, Airport, Route, Flight, Order, Ticket
+from airport.models import Country, City, Airport, Route, Flight
 
 
 class CityFilter(filters.FilterSet):
