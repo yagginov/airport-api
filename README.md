@@ -23,11 +23,24 @@
 	```sh
 	docker-compose up --build
 	```
-3. **Create superuser (for admin access):**
-	```sh
-	docker-compose exec web python manage.py createsuperuser
-	```
-4. **Access the Browsable API:**
+
+
+3. **Run management commands inside the container:**
+	 - First, find your running container ID:
+		 ```sh
+		 docker ps
+		 ```
+	 - Then, enter the container shell:
+		 ```sh
+		 docker exec -it <container_id> sh
+		 ```
+	 - Once inside, you can run Django management commands, for example:
+		 ```sh
+		 python manage.py createsuperuser
+		 python manage.py loaddata fixture.json
+		 ```
+
+5. **Access the Browsable API:**
 	- Visit [http://localhost:8000/api/](http://localhost:8000/api/) in your browser.
 	- Register a user at `/api/accounts/register/` or login via JWT at `/api/accounts/token/`.
 	- Use `/api/accounts/me/` for profile management.
