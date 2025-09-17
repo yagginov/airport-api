@@ -133,16 +133,22 @@ class Ticket(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=["row", "seat", "flight"], name="unique_ticket_per_flight")
+            models.UniqueConstraint(
+                fields=["row", "seat", "flight"], name="unique_ticket_per_flight"
+            )
         ]
 
     def clean(self):
         airplane = self.flight.airplane
         errors = {}
         if self.row > airplane.rows:
-            errors["row"] = f"Row {self.row} exceeds airplane's max rows ({airplane.rows})"
+            errors["row"] = (
+                f"Row {self.row} exceeds airplane's max rows ({airplane.rows})"
+            )
         if self.seat > airplane.seats_in_row:
-            errors["seat"] = f"Seat {self.seat} exceeds airplane's max seats in row ({airplane.seats_in_row})"
+            errors["seat"] = (
+                f"Seat {self.seat} exceeds airplane's max seats in row ({airplane.seats_in_row})"
+            )
         if errors:
             raise ValidationError(errors)
 

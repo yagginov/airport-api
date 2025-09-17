@@ -7,14 +7,21 @@ from airport.models import Airport, City, Country
 
 User = get_user_model()
 
+
 class TestAirportApi(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.admin = User.objects.create_user(username="admin", password="p", is_staff=True)
+        cls.admin = User.objects.create_user(
+            username="admin", password="p", is_staff=True
+        )
         cls.user = User.objects.create_user(username="user", password="p")
         cls.country = Country.objects.create(name="Ukraine")
-        cls.city1 = City.objects.create(name="Kyiv", country=cls.country, is_capital=True, timezone="Europe/Kiev")
-        cls.city2 = City.objects.create(name="Lviv", country=cls.country, is_capital=False, timezone="Europe/Kiev")
+        cls.city1 = City.objects.create(
+            name="Kyiv", country=cls.country, is_capital=True, timezone="Europe/Kiev"
+        )
+        cls.city2 = City.objects.create(
+            name="Lviv", country=cls.country, is_capital=False, timezone="Europe/Kiev"
+        )
         cls.airports = [
             Airport.objects.create(name="Boryspil", closest_big_city=cls.city1),
             Airport.objects.create(name="Zhuliany", closest_big_city=cls.city1),
@@ -191,7 +198,9 @@ class TestAirportApi(APITestCase):
         url = reverse("airport:airport-list")
         response = self.client.get(url, {"country": self.country.id})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        filtered = [a for a in self.airports if a.closest_big_city.country_id == self.country.id]
+        filtered = [
+            a for a in self.airports if a.closest_big_city.country_id == self.country.id
+        ]
         self.assertEqual(len(response.data), len(filtered))
         for obj in filtered:
             found = any(a["id"] == obj.id for a in response.data)

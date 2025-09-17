@@ -7,10 +7,13 @@ from airport.models import Country
 
 User = get_user_model()
 
+
 class TestCountryApi(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.admin = User.objects.create_user(username="admin", password="p", is_staff=True)
+        cls.admin = User.objects.create_user(
+            username="admin", password="p", is_staff=True
+        )
         cls.user = User.objects.create_user(username="user", password="p")
         cls.countries = [
             Country.objects.create(name="Ukraine"),

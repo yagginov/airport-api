@@ -1,3 +1,5 @@
+import re
+
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
@@ -12,6 +14,13 @@ class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["username", "email", "password"]
+
+    def validate_username(self, value):
+        if not re.match(r"^[A-Za-z0-9_]{2,}$", value):
+            raise serializers.ValidationError(
+                "Username must contain only latin letters, digits, and underscores, min 2 chars, no spaces or special/cyrillic characters."
+            )
+        return value
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)

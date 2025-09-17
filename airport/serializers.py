@@ -173,11 +173,17 @@ class TicketSerializer(serializers.ModelSerializer):
         if flight:
             airplane = flight.airplane
             if row and row > airplane.rows:
-                errors["row"] = f"Row {row} exceeds airplane's max rows ({airplane.rows})"
+                errors["row"] = (
+                    f"Row {row} exceeds airplane's max rows ({airplane.rows})"
+                )
             if seat and seat > airplane.seats_in_row:
-                errors["seat"] = f"Seat {seat} exceeds airplane's max seats in row ({airplane.seats_in_row})"
+                errors["seat"] = (
+                    f"Seat {seat} exceeds airplane's max seats in row ({airplane.seats_in_row})"
+                )
             if Ticket.objects.filter(row=row, seat=seat, flight=flight).exists():
-                errors["non_field_errors"] = ["Duplicate ticket for this flight (row, seat)"]
+                errors["non_field_errors"] = [
+                    "Duplicate ticket for this flight (row, seat)"
+                ]
         if errors:
             raise serializers.ValidationError(errors)
         return super().validate(attrs)
@@ -251,9 +257,15 @@ class OrderSerializer(serializers.ModelSerializer):
     def validate_tickets(self, value):
         seen = set()
         for t in value:
-            key = (t["row"], t["seat"], t["flight"].id if hasattr(t["flight"], "id") else t["flight"])
+            key = (
+                t["row"],
+                t["seat"],
+                t["flight"].id if hasattr(t["flight"], "id") else t["flight"],
+            )
             if key in seen:
-                raise serializers.ValidationError("Duplicate tickets in request: (row, seat, flight) must be unique.")
+                raise serializers.ValidationError(
+                    "Duplicate tickets in request: (row, seat, flight) must be unique."
+                )
             seen.add(key)
         return value
 

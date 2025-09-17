@@ -7,10 +7,13 @@ from airport.models import CrewMember
 
 User = get_user_model()
 
+
 class TestCrewMemberApi(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.admin = User.objects.create_user(username="admin", password="p", is_staff=True)
+        cls.admin = User.objects.create_user(
+            username="admin", password="p", is_staff=True
+        )
         cls.user = User.objects.create_user(username="user", password="p")
         cls.crew_members = [
             CrewMember.objects.create(first_name="Ivan", last_name="Ivanov"),
@@ -71,7 +74,9 @@ class TestCrewMemberApi(APITestCase):
         data = {"first_name": "Olga", "last_name": "Koval"}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(CrewMember.objects.filter(first_name="Olga", last_name="Koval").exists())
+        self.assertTrue(
+            CrewMember.objects.filter(first_name="Olga", last_name="Koval").exists()
+        )
 
     def test_create_crew_member_user(self):
         self.authenticate(self.user)
@@ -79,14 +84,22 @@ class TestCrewMemberApi(APITestCase):
         data = {"first_name": "Dmytro", "last_name": "Bondarenko"}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertFalse(CrewMember.objects.filter(first_name="Dmytro", last_name="Bondarenko").exists())
+        self.assertFalse(
+            CrewMember.objects.filter(
+                first_name="Dmytro", last_name="Bondarenko"
+            ).exists()
+        )
 
     def test_create_crew_member_anon(self):
         url = reverse("airport:crew-member-list")
         data = {"first_name": "Svitlana", "last_name": "Kravets"}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertFalse(CrewMember.objects.filter(first_name="Svitlana", last_name="Kravets").exists())
+        self.assertFalse(
+            CrewMember.objects.filter(
+                first_name="Svitlana", last_name="Kravets"
+            ).exists()
+        )
 
     def test_update_crew_member_admin(self):
         self.authenticate(self.admin)
@@ -145,7 +158,11 @@ class TestCrewMemberApi(APITestCase):
         url = reverse("airport:crew-member-list")
         response = self.client.get(url, {"search": "Ivan"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        filtered = [cm for cm in self.crew_members if "Ivan" in cm.first_name or "Ivan" in cm.last_name]
+        filtered = [
+            cm
+            for cm in self.crew_members
+            if "Ivan" in cm.first_name or "Ivan" in cm.last_name
+        ]
         response_names = [t["full_name"] for t in response.data]
         self.assertEqual(len(response.data), len(filtered))
         for obj in filtered:

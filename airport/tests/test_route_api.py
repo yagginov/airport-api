@@ -7,19 +7,34 @@ from airport.models import Country, City, Airport, Route
 
 User = get_user_model()
 
+
 class TestRouteApi(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.admin = User.objects.create_user(username="admin", password="p", is_staff=True)
+        cls.admin = User.objects.create_user(
+            username="admin", password="p", is_staff=True
+        )
         cls.user = User.objects.create_user(username="user", password="p")
         cls.country = Country.objects.create(name="Ukraine")
-        cls.city1 = City.objects.create(name="Kyiv", country=cls.country, is_capital=True, timezone="Europe/Kiev")
-        cls.city2 = City.objects.create(name="Lviv", country=cls.country, is_capital=False, timezone="Europe/Kiev")
-        cls.airport1 = Airport.objects.create(name="Boryspil", closest_big_city=cls.city1)
-        cls.airport2 = Airport.objects.create(name="Lviv Airport", closest_big_city=cls.city2)
+        cls.city1 = City.objects.create(
+            name="Kyiv", country=cls.country, is_capital=True, timezone="Europe/Kiev"
+        )
+        cls.city2 = City.objects.create(
+            name="Lviv", country=cls.country, is_capital=False, timezone="Europe/Kiev"
+        )
+        cls.airport1 = Airport.objects.create(
+            name="Boryspil", closest_big_city=cls.city1
+        )
+        cls.airport2 = Airport.objects.create(
+            name="Lviv Airport", closest_big_city=cls.city2
+        )
         cls.routes = [
-            Route.objects.create(source=cls.airport1, destination=cls.airport2, distance=500),
-            Route.objects.create(source=cls.airport2, destination=cls.airport1, distance=500),
+            Route.objects.create(
+                source=cls.airport1, destination=cls.airport2, distance=500
+            ),
+            Route.objects.create(
+                source=cls.airport2, destination=cls.airport1, distance=500
+            ),
         ]
 
     def authenticate(self, user):
@@ -69,20 +84,32 @@ class TestRouteApi(APITestCase):
     def test_create_route_admin(self):
         self.authenticate(self.admin)
         url = reverse("airport:route-list")
-        data = {"source": self.airport1.id, "destination": self.airport2.id, "distance": 600}
+        data = {
+            "source": self.airport1.id,
+            "destination": self.airport2.id,
+            "distance": 600,
+        }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_create_route_user(self):
         self.authenticate(self.user)
         url = reverse("airport:route-list")
-        data = {"source": self.airport2.id, "destination": self.airport1.id, "distance": 700}
+        data = {
+            "source": self.airport2.id,
+            "destination": self.airport1.id,
+            "distance": 700,
+        }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_create_route_anon(self):
         url = reverse("airport:route-list")
-        data = {"source": self.airport1.id, "destination": self.airport2.id, "distance": 800}
+        data = {
+            "source": self.airport1.id,
+            "destination": self.airport2.id,
+            "distance": 800,
+        }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -90,7 +117,11 @@ class TestRouteApi(APITestCase):
         self.authenticate(self.admin)
         obj = self.routes[0]
         url = reverse("airport:route-detail", args=[obj.id])
-        data = {"source": self.airport1.id, "destination": self.airport2.id, "distance": 999}
+        data = {
+            "source": self.airport1.id,
+            "destination": self.airport2.id,
+            "distance": 999,
+        }
         response = self.client.put(url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         obj.refresh_from_db()
@@ -100,7 +131,11 @@ class TestRouteApi(APITestCase):
         self.authenticate(self.user)
         obj = self.routes[1]
         url = reverse("airport:route-detail", args=[obj.id])
-        data = {"source": self.airport2.id, "destination": self.airport1.id, "distance": 888}
+        data = {
+            "source": self.airport2.id,
+            "destination": self.airport1.id,
+            "distance": 888,
+        }
         response = self.client.put(url, data)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         obj.refresh_from_db()
@@ -109,7 +144,11 @@ class TestRouteApi(APITestCase):
     def test_update_route_anon(self):
         obj = self.routes[0]
         url = reverse("airport:route-detail", args=[obj.id])
-        data = {"source": self.airport1.id, "destination": self.airport2.id, "distance": 777}
+        data = {
+            "source": self.airport1.id,
+            "destination": self.airport2.id,
+            "distance": 777,
+        }
         response = self.client.put(url, data)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         obj.refresh_from_db()
@@ -140,7 +179,11 @@ class TestRouteApi(APITestCase):
         url = reverse("airport:route-list")
         response = self.client.get(url, {"search": "Boryspil"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        filtered = [t for t in self.routes if "Boryspil" in t.source.name or "Boryspil" in t.destination.name]
+        filtered = [
+            t
+            for t in self.routes
+            if "Boryspil" in t.source.name or "Boryspil" in t.destination.name
+        ]
         self.assertGreaterEqual(len(response.data), len(filtered))
         for obj in filtered:
             found = any(r["id"] == obj.id for r in response.data)
@@ -161,7 +204,9 @@ class TestRouteApi(APITestCase):
         url = reverse("airport:route-list")
         response = self.client.get(url, {"source_city": self.city1.id})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        filtered = [r for r in self.routes if r.source.closest_big_city_id == self.city1.id]
+        filtered = [
+            r for r in self.routes if r.source.closest_big_city_id == self.city1.id
+        ]
         self.assertEqual(len(response.data), len(filtered))
         for obj in filtered:
             found = any(r["id"] == obj.id for r in response.data)
@@ -172,7 +217,9 @@ class TestRouteApi(APITestCase):
         url = reverse("airport:route-list")
         response = self.client.get(url, {"destination_city": self.city2.id})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        filtered = [r for r in self.routes if r.destination.closest_big_city_id == self.city2.id]
+        filtered = [
+            r for r in self.routes if r.destination.closest_big_city_id == self.city2.id
+        ]
         self.assertEqual(len(response.data), len(filtered))
         for obj in filtered:
             found = any(r["id"] == obj.id for r in response.data)
@@ -205,7 +252,11 @@ class TestRouteApi(APITestCase):
         url = reverse("airport:route-list")
         response = self.client.get(url, {"source_country": self.country.id})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        filtered = [r for r in self.routes if r.source.closest_big_city.country_id == self.country.id]
+        filtered = [
+            r
+            for r in self.routes
+            if r.source.closest_big_city.country_id == self.country.id
+        ]
         self.assertEqual(len(response.data), len(filtered))
         for obj in filtered:
             found = any(r["id"] == obj.id for r in response.data)
@@ -216,7 +267,11 @@ class TestRouteApi(APITestCase):
         url = reverse("airport:route-list")
         response = self.client.get(url, {"destination_country": self.country.id})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        filtered = [r for r in self.routes if r.destination.closest_big_city.country_id == self.country.id]
+        filtered = [
+            r
+            for r in self.routes
+            if r.destination.closest_big_city.country_id == self.country.id
+        ]
         self.assertEqual(len(response.data), len(filtered))
         for obj in filtered:
             found = any(r["id"] == obj.id for r in response.data)

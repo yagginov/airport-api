@@ -7,17 +7,35 @@ from airport.models import City, Country
 
 User = get_user_model()
 
+
 class TestCityApi(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.admin = User.objects.create_user(username="admin", password="p", is_staff=True)
+        cls.admin = User.objects.create_user(
+            username="admin", password="p", is_staff=True
+        )
         cls.user = User.objects.create_user(username="user", password="p")
         cls.country1 = Country.objects.create(name="Ukraine")
         cls.country2 = Country.objects.create(name="Poland")
         cls.cities = [
-            City.objects.create(name="Kyiv", country=cls.country1, is_capital=True, timezone="Europe/Kiev"),
-            City.objects.create(name="Lviv", country=cls.country1, is_capital=False, timezone="Europe/Kiev"),
-            City.objects.create(name="Warsaw", country=cls.country2, is_capital=True, timezone="Europe/Warsaw"),
+            City.objects.create(
+                name="Kyiv",
+                country=cls.country1,
+                is_capital=True,
+                timezone="Europe/Kiev",
+            ),
+            City.objects.create(
+                name="Lviv",
+                country=cls.country1,
+                is_capital=False,
+                timezone="Europe/Kiev",
+            ),
+            City.objects.create(
+                name="Warsaw",
+                country=cls.country2,
+                is_capital=True,
+                timezone="Europe/Warsaw",
+            ),
         ]
 
     def authenticate(self, user):
@@ -70,7 +88,12 @@ class TestCityApi(APITestCase):
     def test_create_city_admin(self):
         self.authenticate(self.admin)
         url = reverse("airport:city-list")
-        data = {"name": "Odessa", "country": self.country1.id, "is_capital": False, "timezone": "Europe/Kiev"}
+        data = {
+            "name": "Odessa",
+            "country": self.country1.id,
+            "is_capital": False,
+            "timezone": "Europe/Kiev",
+        }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(City.objects.filter(name="Odessa").exists())
@@ -78,14 +101,24 @@ class TestCityApi(APITestCase):
     def test_create_city_user(self):
         self.authenticate(self.user)
         url = reverse("airport:city-list")
-        data = {"name": "Krakow", "country": self.country2.id, "is_capital": False, "timezone": "Europe/Warsaw"}
+        data = {
+            "name": "Krakow",
+            "country": self.country2.id,
+            "is_capital": False,
+            "timezone": "Europe/Warsaw",
+        }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertFalse(City.objects.filter(name="Krakow").exists())
 
     def test_create_city_anon(self):
         url = reverse("airport:city-list")
-        data = {"name": "Dnipro", "country": self.country1.id, "is_capital": False, "timezone": "Europe/Kiev"}
+        data = {
+            "name": "Dnipro",
+            "country": self.country1.id,
+            "is_capital": False,
+            "timezone": "Europe/Kiev",
+        }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertFalse(City.objects.filter(name="Dnipro").exists())
@@ -94,7 +127,12 @@ class TestCityApi(APITestCase):
         self.authenticate(self.admin)
         obj = self.cities[0]
         url = reverse("airport:city-detail", args=[obj.id])
-        data = {"name": "Kyiv Updated", "country": self.country1.id, "is_capital": True, "timezone": "Europe/Kiev"}
+        data = {
+            "name": "Kyiv Updated",
+            "country": self.country1.id,
+            "is_capital": True,
+            "timezone": "Europe/Kiev",
+        }
         response = self.client.put(url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         obj.refresh_from_db()
@@ -104,7 +142,12 @@ class TestCityApi(APITestCase):
         self.authenticate(self.user)
         obj = self.cities[1]
         url = reverse("airport:city-detail", args=[obj.id])
-        data = {"name": "Lviv Updated", "country": self.country1.id, "is_capital": False, "timezone": "Europe/Kiev"}
+        data = {
+            "name": "Lviv Updated",
+            "country": self.country1.id,
+            "is_capital": False,
+            "timezone": "Europe/Kiev",
+        }
         response = self.client.put(url, data)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         obj.refresh_from_db()
@@ -113,7 +156,12 @@ class TestCityApi(APITestCase):
     def test_update_city_anon(self):
         obj = self.cities[2]
         url = reverse("airport:city-detail", args=[obj.id])
-        data = {"name": "Warsaw Updated", "country": self.country2.id, "is_capital": True, "timezone": "Europe/Warsaw"}
+        data = {
+            "name": "Warsaw Updated",
+            "country": self.country2.id,
+            "is_capital": True,
+            "timezone": "Europe/Warsaw",
+        }
         response = self.client.put(url, data)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         obj.refresh_from_db()
