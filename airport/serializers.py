@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from base.serializer_fields import TimeZoneSerializerChoicesField
+from django.db import transaction
 
+from base.serializer_fields import TimeZoneSerializerChoicesField
 from airport.models import (
     AirplaneType,
     Airplane,
@@ -133,23 +134,25 @@ class FlightSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
     def create(self, validated_data: dict) -> Flight:
-        flight_crew_data = validated_data.pop("flight_crew", [])
-        flight = Flight.objects.create(**validated_data)
+        with transaction.atomic():
+            flight_crew_data = validated_data.pop("flight_crew", [])
+            flight = Flight.objects.create(**validated_data)
 
-        for flight_crew in flight_crew_data:
-            FlightCrew.objects.create(flight=flight, **flight_crew)
+            for flight_crew in flight_crew_data:
+                FlightCrew.objects.create(flight=flight, **flight_crew)
 
         return flight
 
     def update(self, instance: Flight, validated_data: dict) -> Flight:
-        crew_member_data = validated_data.pop("flight_crew", [])
+        with transaction.atomic():
+            crew_member_data = validated_data.pop("flight_crew", [])
 
-        for field, value in validated_data.items():
-            setattr(instance, field, value)
-        instance.save()
+            for field, value in validated_data.items():
+                setattr(instance, field, value)
+            instance.save()
 
-        for crew_member in crew_member_data:
-            _, _ = FlightCrew.objects.get_or_create(flight=instance, **crew_member)
+            for crew_member in crew_member_data:
+                _, _ = FlightCrew.objects.get_or_create(flight=instance, **crew_member)
         return instance
 
 
@@ -270,11 +273,12 @@ class OrderSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data: dict) -> Order:
-        tickets = validated_data.pop("tickets", [])
-        order = Order.objects.create(user=self._user, **validated_data)
+        with transaction.atomic():
+            tickets = validated_data.pop("tickets", [])
+            order = Order.objects.create(user=self._user, **validated_data)
 
-        for ticket in tickets:
-            Ticket.objects.create(order=order, **ticket)
+            for ticket in tickets:
+                Ticket.objects.create(order=order, **ticket)
 
         return order
 
