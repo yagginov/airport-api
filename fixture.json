@@ -1,0 +1,67 @@
+[
+  { "model": "airport.airplanetype", "pk": 1, "fields": { "name": "Boeing 737" } },
+  { "model": "airport.airplanetype", "pk": 2, "fields": { "name": "Airbus A320" } },
+  { "model": "airport.airplanetype", "pk": 3, "fields": { "name": "Embraer E190" } },
+
+  { "model": "airport.airplane", "pk": 1, "fields": { "name": "Boeing 737-800", "rows": 30, "seats_in_row": 6, "airplane_type": 1 } },
+  { "model": "airport.airplane", "pk": 2, "fields": { "name": "Boeing 737 MAX", "rows": 32, "seats_in_row": 6, "airplane_type": 1 } },
+  { "model": "airport.airplane", "pk": 3, "fields": { "name": "Airbus A320neo", "rows": 28, "seats_in_row": 6, "airplane_type": 2 } },
+  { "model": "airport.airplane", "pk": 4, "fields": { "name": "Airbus A321", "rows": 35, "seats_in_row": 6, "airplane_type": 2 } },
+  { "model": "airport.airplane", "pk": 5, "fields": { "name": "Embraer 190", "rows": 25, "seats_in_row": 4, "airplane_type": 3 } },
+
+  { "model": "airport.crewmember", "pk": 1, "fields": { "first_name": "John", "last_name": "Doe" } },
+  { "model": "airport.crewmember", "pk": 2, "fields": { "first_name": "Jane", "last_name": "Smith" } },
+  { "model": "airport.crewmember", "pk": 3, "fields": { "first_name": "Mark", "last_name": "Brown" } },
+  { "model": "airport.crewmember", "pk": 4, "fields": { "first_name": "Anna", "last_name": "Taylor" } },
+  { "model": "airport.crewmember", "pk": 5, "fields": { "first_name": "Peter", "last_name": "Johnson" } },
+  { "model": "airport.crewmember", "pk": 6, "fields": { "first_name": "Maria", "last_name": "Lopez" } },
+
+  { "model": "airport.country", "pk": 1, "fields": { "name": "Ukraine" } },
+  { "model": "airport.country", "pk": 2, "fields": { "name": "United Kingdom" } },
+  { "model": "airport.country", "pk": 3, "fields": { "name": "Germany" } },
+
+  { "model": "airport.city", "pk": 1, "fields": { "name": "Kyiv", "country": 1, "is_capital": true, "timezone": "Europe/Kyiv" } },
+  { "model": "airport.city", "pk": 2, "fields": { "name": "Lviv", "country": 1, "is_capital": false, "timezone": "Europe/Kyiv" } },
+  { "model": "airport.city", "pk": 3, "fields": { "name": "London", "country": 2, "is_capital": true, "timezone": "Europe/London" } },
+  { "model": "airport.city", "pk": 4, "fields": { "name": "Manchester", "country": 2, "is_capital": false, "timezone": "Europe/London" } },
+  { "model": "airport.city", "pk": 5, "fields": { "name": "Berlin", "country": 3, "is_capital": true, "timezone": "Europe/Berlin" } },
+  { "model": "airport.city", "pk": 6, "fields": { "name": "Munich", "country": 3, "is_capital": false, "timezone": "Europe/Berlin" } },
+
+  { "model": "airport.airport", "pk": 1, "fields": { "name": "Boryspil International Airport", "closest_big_city": 1 } },
+  { "model": "airport.airport", "pk": 2, "fields": { "name": "Lviv Danylo Halytskyi Airport", "closest_big_city": 2 } },
+  { "model": "airport.airport", "pk": 3, "fields": { "name": "Heathrow Airport", "closest_big_city": 3 } },
+  { "model": "airport.airport", "pk": 4, "fields": { "name": "Manchester Airport", "closest_big_city": 4 } },
+  { "model": "airport.airport", "pk": 5, "fields": { "name": "Berlin Brandenburg Airport", "closest_big_city": 5 } },
+  { "model": "airport.airport", "pk": 6, "fields": { "name": "Munich International Airport", "closest_big_city": 6 } },
+
+  { "model": "airport.route", "pk": 1, "fields": { "source": 1, "destination": 3, "distance": 2400 } },
+  { "model": "airport.route", "pk": 2, "fields": { "source": 2, "destination": 5, "distance": 1100 } },
+  { "model": "airport.route", "pk": 3, "fields": { "source": 3, "destination": 5, "distance": 950 } },
+  { "model": "airport.route", "pk": 4, "fields": { "source": 4, "destination": 6, "distance": 1100 } },
+
+  { "model": "airport.flight", "pk": 1, "fields": { "route": 1, "airplane": 1, "departure_time": "2025-09-20T08:00:00Z", "arrival_time": "2025-09-20T10:30:00Z" } },
+  { "model": "airport.flight", "pk": 2, "fields": { "route": 2, "airplane": 5, "departure_time": "2025-09-21T09:15:00Z", "arrival_time": "2025-09-21T10:45:00Z" } },
+  { "model": "airport.flight", "pk": 3, "fields": { "route": 3, "airplane": 3, "departure_time": "2025-09-22T14:00:00Z", "arrival_time": "2025-09-22T15:40:00Z" } },
+  { "model": "airport.flight", "pk": 4, "fields": { "route": 4, "airplane": 4, "departure_time": "2025-09-23T18:30:00Z", "arrival_time": "2025-09-23T20:15:00Z" } },
+
+  { "model": "airport.flightcrew", "pk": 1, "fields": { "flight": 1, "crew_member": 1, "role": "CAPTAIN" } },
+  { "model": "airport.flightcrew", "pk": 2, "fields": { "flight": 1, "crew_member": 2, "role": "FIRST_OFFICER" } },
+  { "model": "airport.flightcrew", "pk": 3, "fields": { "flight": 2, "crew_member": 3, "role": "CAPTAIN" } },
+  { "model": "airport.flightcrew", "pk": 4, "fields": { "flight": 2, "crew_member": 4, "role": "FIRST_OFFICER" } },
+  { "model": "airport.flightcrew", "pk": 5, "fields": { "flight": 3, "crew_member": 5, "role": "CAPTAIN" } },
+  { "model": "airport.flightcrew", "pk": 6, "fields": { "flight": 3, "crew_member": 6, "role": "FIRST_OFFICER" } },
+  { "model": "airport.flightcrew", "pk": 7, "fields": { "flight": 4, "crew_member": 2, "role": "CAPTAIN" } },
+  { "model": "airport.flightcrew", "pk": 8, "fields": { "flight": 4, "crew_member": 4, "role": "FIRST_OFFICER" } },
+
+  { "model": "airport.order", "pk": 1, "fields": { "user": 1, "created_at": "2025-09-17T18:00:00Z" } },
+  { "model": "airport.order", "pk": 2, "fields": { "user": 1, "created_at": "2025-09-18T10:00:00Z" } },
+  { "model": "airport.order", "pk": 3, "fields": { "user": 1, "created_at": "2025-09-19T12:00:00Z" } },
+
+  { "model": "airport.ticket", "pk": 1, "fields": { "row": 5, "seat": 3, "flight": 1, "order": 1 } },
+  { "model": "airport.ticket", "pk": 2, "fields": { "row": 5, "seat": 4, "flight": 1, "order": 1 } },
+  { "model": "airport.ticket", "pk": 3, "fields": { "row": 10, "seat": 2, "flight": 2, "order": 2 } },
+  { "model": "airport.ticket", "pk": 4, "fields": { "row": 11, "seat": 3, "flight": 2, "order": 2 } },
+  { "model": "airport.ticket", "pk": 5, "fields": { "row": 8, "seat": 1, "flight": 3, "order": 3 } },
+  { "model": "airport.ticket", "pk": 6, "fields": { "row": 8, "seat": 2, "flight": 3, "order": 3 } },
+  { "model": "airport.ticket", "pk": 7, "fields": { "row": 12, "seat": 5, "flight": 4, "order": 1 } }
+]
