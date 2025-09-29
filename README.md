@@ -16,7 +16,7 @@
 
 1. **Clone the repository:**
 	```sh
-	git clone <your-repo-url>
+	git clone https://github.com/yagginov/airport-api.git
 	cd airport-api
 	```
 2. **Start the project with Docker Compose:**
